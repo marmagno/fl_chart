@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:math' as math;
@@ -10,8 +9,7 @@ class SideTitlesFlex extends MultiChildRenderObjectWidget {
     Key? key,
     required this.direction,
     required this.axisSideMetaData,
-    List<AxisSideTitleWidgetHolder> widgetHolders =
-        const <AxisSideTitleWidgetHolder>[],
+    List<AxisSideTitleWidgetHolder> widgetHolders = const <AxisSideTitleWidgetHolder>[],
   })  : axisSideTitlesMetaData = widgetHolders.map((e) => e.metaData).toList(),
         super(key: key, children: widgetHolders.map((e) => e.widget).toList());
 
@@ -29,8 +27,7 @@ class SideTitlesFlex extends MultiChildRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(
-      BuildContext context, covariant AxisSideTitlesRenderFlex renderObject) {
+  void updateRenderObject(BuildContext context, covariant AxisSideTitlesRenderFlex renderObject) {
     renderObject.direction = direction;
     renderObject.axisSideMetaData = axisSideMetaData;
     renderObject.axisSideTitlesMetaData = axisSideTitlesMetaData;
@@ -76,8 +73,7 @@ class AxisSideTitlesRenderFlex extends RenderBox
     }
   }
 
-  List<AxisSideTitleMetaData> get axisSideTitlesMetaData =>
-      _axisSideTitlesMetaData;
+  List<AxisSideTitleMetaData> get axisSideTitlesMetaData => _axisSideTitlesMetaData;
   List<AxisSideTitleMetaData> _axisSideTitlesMetaData;
 
   set axisSideTitlesMetaData(List<AxisSideTitleMetaData> value) {
@@ -138,33 +134,25 @@ class AxisSideTitlesRenderFlex extends RenderBox
     }
   }
 
-  _LayoutSizes _computeSizes(
-      {required BoxConstraints constraints,
-      required ChildLayouter layoutChild}) {
+  _LayoutSizes _computeSizes({required BoxConstraints constraints, required ChildLayouter layoutChild}) {
     // Determine used flex factor, size inflexible items, calculate free space.
-    final double maxMainSize = _direction == Axis.horizontal
-        ? constraints.maxWidth
-        : constraints.maxHeight;
+    final double maxMainSize = _direction == Axis.horizontal ? constraints.maxWidth : constraints.maxHeight;
     final bool canFlex = maxMainSize < double.infinity;
 
     double crossSize = 0.0;
-    double allocatedSize =
-        0.0; // Sum of the sizes of the non-flexible children.
+    double allocatedSize = 0.0; // Sum of the sizes of the non-flexible children.
     RenderBox? child = firstChild;
     while (child != null) {
-      final FlexParentData childParentData =
-          child.parentData! as FlexParentData;
+      final FlexParentData childParentData = child.parentData! as FlexParentData;
       final BoxConstraints innerConstraints;
 
       // Stretch
       switch (_direction) {
         case Axis.horizontal:
-          innerConstraints =
-              BoxConstraints.tightFor(height: constraints.maxHeight);
+          innerConstraints = BoxConstraints.tightFor(height: constraints.maxHeight);
           break;
         case Axis.vertical:
-          innerConstraints =
-              BoxConstraints.tightFor(width: constraints.maxWidth);
+          innerConstraints = BoxConstraints.tightFor(width: constraints.maxWidth);
           break;
       }
 
@@ -212,23 +200,19 @@ class AxisSideTitlesRenderFlex extends RenderBox
     RenderBox? child = firstChild;
     int counter = 0;
     while (child != null) {
-      final FlexParentData childParentData =
-          child.parentData! as FlexParentData;
+      final FlexParentData childParentData = child.parentData! as FlexParentData;
       final metaData = _axisSideTitlesMetaData[counter];
       final double childCrossPosition;
 
       // Stretch
       childCrossPosition = 0.0;
-      final childMainPosition =
-          metaData.axisPixelLocation - (_getMainSize(child.size) / 2);
+      final childMainPosition = metaData.axisPixelLocation - (_getMainSize(child.size) / 2);
       switch (_direction) {
         case Axis.horizontal:
-          childParentData.offset =
-              Offset(childMainPosition, childCrossPosition);
+          childParentData.offset = Offset(childMainPosition, childCrossPosition);
           break;
         case Axis.vertical:
-          childParentData.offset =
-              Offset(childCrossPosition, childMainPosition);
+          childParentData.offset = Offset(childCrossPosition, childMainPosition);
           break;
       }
       child = childParentData.nextSibling;
@@ -252,8 +236,7 @@ class AxisSideTitlesRenderFlex extends RenderBox
     defaultPaint(context, offset);
   }
 
-  final LayerHandle<ClipRectLayer> _clipRectLayer =
-      LayerHandle<ClipRectLayer>();
+  final LayerHandle<ClipRectLayer> _clipRectLayer = LayerHandle<ClipRectLayer>();
 
   @override
   void dispose() {

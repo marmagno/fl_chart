@@ -11,7 +11,6 @@ import 'line_chart/line_chart_page3.dart';
 import 'line_chart/line_chart_page4.dart';
 import 'pie_chart/pie_chart_page.dart';
 import 'utils/platform_info.dart';
-import 'scatter_chart/scatter_chart_page.dart';
 
 void main() => runApp(const MyApp());
 
@@ -77,9 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: SafeArea(
         child: PageView(
-          physics: isDesktopOrWeb
-              ? const NeverScrollableScrollPhysics()
-              : const AlwaysScrollableScrollPhysics(),
+          physics: isDesktopOrWeb ? const NeverScrollableScrollPhysics() : const AlwaysScrollableScrollPhysics(),
           controller: _controller,
           children: _pages,
         ),
@@ -94,8 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Visibility(
                     visible: _currentPage != 0,
                     child: FloatingActionButton(
-                      onPressed: () => _controller.previousPage(
-                          duration: _duration, curve: _curve),
+                      onPressed: () => _controller.previousPage(duration: _duration, curve: _curve),
                       child: const Icon(Icons.chevron_left_rounded),
                     ),
                   ),
@@ -103,8 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Visibility(
                     visible: _currentPage != _pages.length - 1,
                     child: FloatingActionButton(
-                      onPressed: () => _controller.nextPage(
-                          duration: _duration, curve: _curve),
+                      onPressed: () => _controller.nextPage(duration: _duration, curve: _curve),
                       child: const Icon(Icons.chevron_right_rounded),
                     ),
                   ),
