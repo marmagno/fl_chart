@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:equatable/equatable.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fl_chart/src/chart/bar_chart/bar_chart_helper.dart';
+import 'package:fl_chart/src/chart/line_chart/line_chart_helper.dart';
 import 'package:fl_chart/src/utils/lerp.dart';
 import 'package:fl_chart/src/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,9 @@ import 'dart:math';
 class BarChartData extends AxisChartData with EquatableMixin {
   /// [BarChart] draws [barGroups] that each of them contains a list of [BarChartRodData].
   final List<BarChartGroupData> barGroups;
+
+  /// [BarChart] draws some lines in various shapes and overlaps them.
+  final List<LineChartBarData> lineBarsData;
 
   /// Apply space between the [barGroups].
   final double groupsSpace;
@@ -49,6 +53,8 @@ class BarChartData extends AxisChartData with EquatableMixin {
     BarChartAlignment? alignment,
     FlTitlesData? titlesData,
     BarTouchData? barTouchData,
+    double? lineMinX,
+    double? lineMaxX,
     double? maxY,
     double? minY,
     double? baselineY,
@@ -56,10 +62,12 @@ class BarChartData extends AxisChartData with EquatableMixin {
     FlBorderData? borderData,
     RangeAnnotations? rangeAnnotations,
     Color? backgroundColor,
+    List<LineChartBarData>? lineBarsData,
   })  : barGroups = barGroups ?? const [],
         groupsSpace = groupsSpace ?? 16,
         alignment = alignment ?? BarChartAlignment.spaceEvenly,
         barTouchData = barTouchData ?? BarTouchData(),
+        lineBarsData = lineBarsData ?? const [],
         super(
           titlesData: titlesData ??
               FlTitlesData(
@@ -74,8 +82,14 @@ class BarChartData extends AxisChartData with EquatableMixin {
           rangeAnnotations: rangeAnnotations ?? RangeAnnotations(),
           backgroundColor: backgroundColor,
           touchData: barTouchData ?? BarTouchData(),
-          minX: 0,
-          maxX: 1,
+          minX: lineMinX ??
+              (lineBarsData?.isNotEmpty == true
+                  ? LineChartHelper.calculateMaxAxisValues(lineBarsData!).minX
+                  : 0),
+          maxX: lineMaxX ??
+              (lineBarsData?.isNotEmpty == true
+                  ? LineChartHelper.calculateMaxAxisValues(lineBarsData!).maxX
+                  : 1),
           maxY: maxY ??
               BarChartHelper.calculateMaxAxisValues(barGroups ?? []).maxY,
           minY: minY ??
@@ -94,10 +108,13 @@ class BarChartData extends AxisChartData with EquatableMixin {
     BarTouchData? barTouchData,
     FlGridData? gridData,
     FlBorderData? borderData,
+    double? lineMinX,
+    double? lineMaxX,
     double? maxY,
     double? minY,
     double? baselineY,
     Color? backgroundColor,
+    List<LineChartBarData>? lineBarsData,
   }) {
     return BarChartData(
       barGroups: barGroups ?? this.barGroups,
@@ -108,10 +125,13 @@ class BarChartData extends AxisChartData with EquatableMixin {
       barTouchData: barTouchData ?? this.barTouchData,
       gridData: gridData ?? this.gridData,
       borderData: borderData ?? this.borderData,
+      lineMinX: lineMinX ?? minX,
+      lineMaxX: lineMaxX ?? maxX,
       maxY: maxY ?? this.maxY,
       minY: minY ?? this.minY,
       baselineY: baselineY ?? this.baselineY,
       backgroundColor: backgroundColor ?? this.backgroundColor,
+      lineBarsData: lineBarsData ?? this.lineBarsData,
     );
   }
 
@@ -129,10 +149,14 @@ class BarChartData extends AxisChartData with EquatableMixin {
         barTouchData: b.barTouchData,
         gridData: FlGridData.lerp(a.gridData, b.gridData, t),
         borderData: FlBorderData.lerp(a.borderData, b.borderData, t),
+        lineMinX: lerpDouble(a.minX, b.minX, t),
+        lineMaxX: lerpDouble(a.maxX, b.maxX, t),
         maxY: lerpDouble(a.maxY, b.maxY, t),
         minY: lerpDouble(a.minY, b.minY, t),
         baselineY: lerpDouble(a.baselineY, b.baselineY, t),
         backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
+        lineBarsData:
+            lerpLineChartBarDataList(a.lineBarsData, b.lineBarsData, t),
       );
     } else {
       throw Exception('Illegal State');
@@ -147,6 +171,8 @@ class BarChartData extends AxisChartData with EquatableMixin {
         alignment,
         titlesData,
         barTouchData,
+        minX,
+        maxX,
         maxY,
         minY,
         baselineY,
@@ -154,6 +180,7 @@ class BarChartData extends AxisChartData with EquatableMixin {
         borderData,
         rangeAnnotations,
         backgroundColor,
+        lineBarsData,
       ];
 }
 

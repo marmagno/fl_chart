@@ -81,6 +81,19 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
             holder);
       }
     }
+
+    if (data.lineBarsData.isNotEmpty) {
+      /// draw each line independently on the chart
+      for (var i = 0; i < data.lineBarsData.length; i++) {
+        final barData = data.lineBarsData[i];
+
+        if (!barData.show) {
+          continue;
+        }
+
+        super.drawBarLine(canvasWrapper, barData, holder);
+      }
+    }
   }
 
   /// Calculates bars position alongside group positions.

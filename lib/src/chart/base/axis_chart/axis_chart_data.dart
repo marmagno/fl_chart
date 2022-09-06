@@ -841,3 +841,305 @@ class VerticalRangeAnnotation with EquatableMixin {
         color,
       ];
 }
+
+/// Holds data for drawing each individual line in the [LineChart]
+class LineChartBarData with EquatableMixin {
+  /// This line goes through this spots.
+  ///
+  /// You can have multiple lines by splitting them,
+  /// put a [FlSpot.nullSpot] between each section.
+  final List<FlSpot> spots;
+
+  /// We keep the most left spot to prevent redundant calculations
+  late final FlSpot mostLeftSpot;
+
+  /// We keep the most top spot to prevent redundant calculations
+  late final FlSpot mostTopSpot;
+
+  /// We keep the most right spot to prevent redundant calculations
+  late final FlSpot mostRightSpot;
+
+  /// We keep the most bottom spot to prevent redundant calculations
+  late final FlSpot mostBottomSpot;
+
+  /// Determines to show or hide the line.
+  final bool show;
+
+  /// If provided, this [LineChartBarData] draws with this [color]
+  /// Otherwise we use  [gradient] to draw the background.
+  /// It throws an exception if you provide both [color] and [gradient]
+  final Color? color;
+
+  /// If provided, this [LineChartBarData] draws with this [gradient].
+  /// Otherwise we use [color] to draw the background.
+  /// It throws an exception if you provide both [color] and [gradient]
+  final Gradient? gradient;
+
+  /// Determines thickness of drawing line.
+  final double barWidth;
+
+  /// If it's true, [LineChart] draws the line with curved edges,
+  /// otherwise it draws line with hard edges.
+  final bool isCurved;
+
+  /// If [isCurved] is true, it determines smoothness of the curved edges.
+  final double curveSmoothness;
+
+  /// Prevent overshooting when draw curve line with high value changes.
+  /// check this [issue](https://github.com/imaNNeoFighT/fl_chart/issues/25)
+  final bool preventCurveOverShooting;
+
+  /// Applies threshold for [preventCurveOverShooting] algorithm.
+  final double preventCurveOvershootingThreshold;
+
+  /// Determines the style of line's cap.
+  final bool isStrokeCapRound;
+
+  /// Determines the style of line joins.
+  final bool isStrokeJoinRound;
+
+  /// Fills the space blow the line, using a color or gradient.
+  final BarAreaData belowBarData;
+
+  /// Fills the space above the line, using a color or gradient.
+  final BarAreaData aboveBarData;
+
+  /// Responsible to showing [spots] on the line as a circular point.
+  final FlDotData dotData;
+
+  /// Show indicators based on provided indexes
+  final List<int> showingIndicators;
+
+  /// Determines the dash length and space respectively, fill it if you want to have dashed line.
+  final List<int>? dashArray;
+
+  /// Drops a shadow behind the bar line.
+  final Shadow shadow;
+
+  /// If sets true, it draws the chart in Step Line Chart style, using [LineChartBarData.lineChartStepData].
+  final bool isStepLineChart;
+
+  /// Holds data for representing a Step Line Chart, and works only if [isStepChart] is true.
+  final LineChartStepData lineChartStepData;
+
+  /// [BarChart] draws some lines and overlaps them in the chart's view,
+  /// You can have multiple lines by splitting them,
+  /// put a [FlSpot.nullSpot] between each section.
+  /// each line passes through [spots], with hard edges by default,
+  /// [isCurved] makes it curve for drawing, and [curveSmoothness] determines the curve smoothness.
+  ///
+  /// [show] determines the drawing, if set to false, it draws nothing.
+  ///
+  /// [mainColors] determines the color of drawing line, if one color provided it applies a solid color,
+  /// otherwise it gradients between provided colors for drawing the line.
+  /// Gradient happens using provided [colorStops], [gradientFrom], [gradientTo].
+  /// if you want it draw normally, don't touch them,
+  /// check [LinearGradient] for understanding [colorStops]
+  ///
+  /// [barWidth] determines the thickness of drawing line,
+  ///
+  /// if [isCurved] is true, in some situations if the spots changes are in high values,
+  /// an overshooting will happen, we don't have any idea to solve this at the moment,
+  /// but you can set [preventCurveOverShooting] true, and update the threshold
+  /// using [preventCurveOvershootingThreshold] to achieve an acceptable curve,
+  /// check this [issue](https://github.com/imaNNeoFighT/fl_chart/issues/25)
+  /// to overshooting understand the problem.
+  ///
+  /// [isStrokeCapRound] determines the shape of line's cap.
+  ///
+  /// [isStrokeJoinRound] determines the shape of the line joins.
+  ///
+  /// [belowBarData], and  [aboveBarData] used to fill the space below or above the drawn line,
+  /// you can fill with a solid color or a linear gradient.
+  ///
+  /// [LineChart] draws points that the line is going through [spots],
+  /// you can customize it's appearance using [dotData].
+  ///
+  /// there are some indicators with a line and bold point on each spot,
+  /// you can show them by filling [showingIndicators] with indices
+  /// you want to show indicator on them.
+  ///
+  /// [LineChart] draws the lines with dashed effect if you fill [dashArray].
+  ///
+  /// If you want to have a Step Line Chart style, just set [isStepLineChart] true,
+  /// also you can tweak the [LineChartBarData.lineChartStepData].
+  LineChartBarData({
+    List<FlSpot>? spots,
+    bool? show,
+    Color? color,
+    Gradient? gradient,
+    double? barWidth,
+    bool? isCurved,
+    double? curveSmoothness,
+    bool? preventCurveOverShooting,
+    double? preventCurveOvershootingThreshold,
+    bool? isStrokeCapRound,
+    bool? isStrokeJoinRound,
+    BarAreaData? belowBarData,
+    BarAreaData? aboveBarData,
+    FlDotData? dotData,
+    List<int>? showingIndicators,
+    List<int>? dashArray,
+    Shadow? shadow,
+    bool? isStepLineChart,
+    LineChartStepData? lineChartStepData,
+  })  : spots = spots ?? const [],
+        show = show ?? true,
+        color =
+            color ?? ((color == null && gradient == null) ? Colors.cyan : null),
+        gradient = gradient,
+        barWidth = barWidth ?? 2.0,
+        isCurved = isCurved ?? false,
+        curveSmoothness = curveSmoothness ?? 0.35,
+        preventCurveOverShooting = preventCurveOverShooting ?? false,
+        preventCurveOvershootingThreshold =
+            preventCurveOvershootingThreshold ?? 10.0,
+        isStrokeCapRound = isStrokeCapRound ?? false,
+        isStrokeJoinRound = isStrokeJoinRound ?? false,
+        belowBarData = belowBarData ?? BarAreaData(),
+        aboveBarData = aboveBarData ?? BarAreaData(),
+        dotData = dotData ?? FlDotData(),
+        showingIndicators = showingIndicators ?? const [],
+        dashArray = dashArray,
+        shadow = shadow ?? const Shadow(color: Colors.transparent),
+        isStepLineChart = isStepLineChart ?? false,
+        lineChartStepData = lineChartStepData ?? LineChartStepData() {
+    FlSpot? mostLeft, mostTop, mostRight, mostBottom;
+
+    FlSpot? firstValidSpot;
+    try {
+      firstValidSpot =
+          this.spots.firstWhere((element) => element != FlSpot.nullSpot);
+    } catch (e) {
+      // There is no valid spot
+    }
+    if (firstValidSpot != null) {
+      for (var spot in this.spots) {
+        if (spot.isNull()) {
+          continue;
+        }
+        if (mostLeft == null || spot.x < mostLeft.x) {
+          mostLeft = spot;
+        }
+
+        if (mostRight == null || spot.x > mostRight.x) {
+          mostRight = spot;
+        }
+
+        if (mostTop == null || spot.y > mostTop.y) {
+          mostTop = spot;
+        }
+
+        if (mostBottom == null || spot.y < mostBottom.y) {
+          mostBottom = spot;
+        }
+      }
+      mostLeftSpot = mostLeft!;
+      mostTopSpot = mostTop!;
+      mostRightSpot = mostRight!;
+      mostBottomSpot = mostBottom!;
+    }
+  }
+
+  /// Lerps a [LineChartBarData] based on [t] value, check [Tween.lerp].
+  static LineChartBarData lerp(
+      LineChartBarData a, LineChartBarData b, double t) {
+    return LineChartBarData(
+      show: b.show,
+      barWidth: lerpDouble(a.barWidth, b.barWidth, t),
+      belowBarData: BarAreaData.lerp(a.belowBarData, b.belowBarData, t),
+      aboveBarData: BarAreaData.lerp(a.aboveBarData, b.aboveBarData, t),
+      curveSmoothness: b.curveSmoothness,
+      isCurved: b.isCurved,
+      isStrokeCapRound: b.isStrokeCapRound,
+      isStrokeJoinRound: b.isStrokeJoinRound,
+      preventCurveOverShooting: b.preventCurveOverShooting,
+      preventCurveOvershootingThreshold: lerpDouble(
+          a.preventCurveOvershootingThreshold,
+          b.preventCurveOvershootingThreshold,
+          t),
+      dotData: FlDotData.lerp(a.dotData, b.dotData, t),
+      dashArray: lerpIntList(a.dashArray, b.dashArray, t),
+      color: Color.lerp(a.color, b.color, t),
+      gradient: Gradient.lerp(a.gradient, b.gradient, t),
+      spots: lerpFlSpotList(a.spots, b.spots, t),
+      showingIndicators: b.showingIndicators,
+      shadow: Shadow.lerp(a.shadow, b.shadow, t),
+      isStepLineChart: b.isStepLineChart,
+      lineChartStepData:
+          LineChartStepData.lerp(a.lineChartStepData, b.lineChartStepData, t),
+    );
+  }
+
+  /// Copies current [LineChartBarData] to a new [LineChartBarData],
+  /// and replaces provided values.
+  LineChartBarData copyWith({
+    List<FlSpot>? spots,
+    bool? show,
+    Color? color,
+    Gradient? gradient,
+    double? barWidth,
+    bool? isCurved,
+    double? curveSmoothness,
+    bool? preventCurveOverShooting,
+    double? preventCurveOvershootingThreshold,
+    bool? isStrokeCapRound,
+    bool? isStrokeJoinRound,
+    BarAreaData? belowBarData,
+    BarAreaData? aboveBarData,
+    FlDotData? dotData,
+    List<int>? dashArray,
+    List<int>? showingIndicators,
+    Shadow? shadow,
+    bool? isStepLineChart,
+    LineChartStepData? lineChartStepData,
+  }) {
+    return LineChartBarData(
+      spots: spots ?? this.spots,
+      show: show ?? this.show,
+      color: color ?? this.color,
+      gradient: gradient ?? this.gradient,
+      barWidth: barWidth ?? this.barWidth,
+      isCurved: isCurved ?? this.isCurved,
+      curveSmoothness: curveSmoothness ?? this.curveSmoothness,
+      preventCurveOverShooting:
+          preventCurveOverShooting ?? this.preventCurveOverShooting,
+      preventCurveOvershootingThreshold: preventCurveOvershootingThreshold ??
+          this.preventCurveOvershootingThreshold,
+      isStrokeCapRound: isStrokeCapRound ?? this.isStrokeCapRound,
+      isStrokeJoinRound: isStrokeJoinRound ?? this.isStrokeJoinRound,
+      belowBarData: belowBarData ?? this.belowBarData,
+      aboveBarData: aboveBarData ?? this.aboveBarData,
+      dashArray: dashArray ?? this.dashArray,
+      dotData: dotData ?? this.dotData,
+      showingIndicators: showingIndicators ?? this.showingIndicators,
+      shadow: shadow ?? this.shadow,
+      isStepLineChart: isStepLineChart ?? this.isStepLineChart,
+      lineChartStepData: lineChartStepData ?? this.lineChartStepData,
+    );
+  }
+
+  /// Used for equality check, see [EquatableMixin].
+  @override
+  List<Object?> get props => [
+        spots,
+        show,
+        color,
+        gradient,
+        barWidth,
+        isCurved,
+        curveSmoothness,
+        preventCurveOverShooting,
+        preventCurveOvershootingThreshold,
+        isStrokeCapRound,
+        isStrokeJoinRound,
+        belowBarData,
+        aboveBarData,
+        dotData,
+        showingIndicators,
+        dashArray,
+        shadow,
+        isStepLineChart,
+        lineChartStepData,
+      ];
+}
